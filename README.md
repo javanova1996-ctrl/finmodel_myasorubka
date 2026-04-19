@@ -1,1 +1,0 @@
-# finmodel_myasorubka
