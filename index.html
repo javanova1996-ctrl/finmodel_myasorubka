@@ -1,0 +1,220 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Финансовая модель — Группа предприятий 2026</title>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.js"></script>
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,sans-serif;background:#f5f5f4;color:#1c1917;min-height:100vh}
+.header{background:#1F3864;color:#fff;padding:14px 24px;display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:10px}
+.header-left h1{font-size:15px;font-weight:600;letter-spacing:-.01em}
+.header-left p{font-size:11px;opacity:.6;margin-top:2px}
+.wrap{max-width:1160px;margin:0 auto;padding:18px 16px}
+.topbar{display:flex;align-items:center;justify-content:space-between;margin-bottom:18px;gap:12px;flex-wrap:wrap}
+.nav-pills{display:flex;background:#fff;border:0.5px solid #e2e2e0;border-radius:10px;padding:3px;gap:2px;flex-wrap:wrap}
+.np{padding:7px 15px;font-size:12px;font-weight:500;border:none;border-radius:8px;background:transparent;color:#78716c;cursor:pointer;white-space:nowrap;transition:all .15s}
+.np:hover{background:#f5f5f4}
+.np.active{background:#1F3864;color:#fff}
+.period-btn{display:flex;align-items:center;gap:6px;padding:8px 13px;font-size:12px;font-weight:500;border:0.5px solid #d6d3d1;border-radius:9px;background:#fff;color:#1c1917;cursor:pointer;white-space:nowrap;position:relative;box-shadow:0 1px 2px rgba(0,0,0,.04)}
+.period-dot{width:7px;height:7px;border-radius:50%;background:#185FA5;flex-shrink:0}
+.chev{width:14px;height:14px;stroke:#78716c;fill:none;stroke-width:2;stroke-linecap:round}
+.dropdown{position:absolute;top:calc(100% + 6px);right:0;background:#fff;border:0.5px solid #e2e2e0;border-radius:12px;padding:6px;min-width:210px;z-index:9999;display:none;box-shadow:0 4px 16px rgba(0,0,0,.08)}
+.dropdown.open{display:block}
+.dd-sec{font-size:10px;font-weight:600;color:#a8a29e;text-transform:uppercase;letter-spacing:.06em;padding:6px 10px 3px}
+.dd-item{display:flex;align-items:center;justify-content:space-between;padding:8px 10px;font-size:12px;border-radius:8px;cursor:pointer;color:#1c1917}
+.dd-item:hover{background:#f5f5f4}
+.dd-check{width:16px;height:16px;border:1.5px solid #d6d3d1;border-radius:4px;display:flex;align-items:center;justify-content:center;flex-shrink:0;transition:all .15s}
+.dd-check.on{background:#185FA5;border-color:#185FA5}
+.dd-check.on::after{content:'';display:block;width:8px;height:5px;border-left:2px solid #fff;border-bottom:2px solid #fff;transform:rotate(-45deg) translateY(-1px)}
+.dd-sep{height:0.5px;background:#f0ede9;margin:5px 0}
+.dd-preset{padding:7px 10px;font-size:11px;color:#78716c;border-radius:8px;cursor:pointer}
+.dd-preset:hover{background:#f5f5f4;color:#1c1917}
+.page{display:none}.page.active{display:block}
+.g3{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:12px;margin-bottom:14px}
+.g2{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:12px;margin-bottom:14px}
+@media(max-width:700px){.g3{grid-template-columns:1fr 1fr}.g2{grid-template-columns:1fr}}
+@media(max-width:420px){.g3{grid-template-columns:1fr}}
+.card{background:#fff;border:0.5px solid #e2e2e0;border-radius:12px;padding:16px;margin-bottom:12px}
+.kpi{background:#fafaf9;border:0.5px solid #e2e2e0;border-radius:10px;padding:14px;position:relative;overflow:hidden}
+.kpi::before{content:'';position:absolute;left:0;top:0;bottom:0;width:3px;border-radius:3px 0 0 3px}
+.kpi.pos::before{background:#1D9E75}
+.kpi.neg::before{background:#E24B4A}
+.kpi.neu::before{background:#378ADD}
+.kpi .kl{font-size:11px;color:#78716c;margin-bottom:6px;font-weight:500}
+.kpi .kv{font-size:21px;font-weight:600;line-height:1.1;letter-spacing:-.02em}
+.kpi .ks{font-size:11px;color:#a8a29e;margin-top:5px}
+.green{color:#085041}.red{color:#7F1D1D}.blue{color:#1e3a5f}
+.bg{background:#DCFCE7;color:#166534;font-size:10px;padding:2px 7px;border-radius:4px;font-weight:600}
+.br{background:#FEE2E2;color:#991B1B;font-size:10px;padding:2px 7px;border-radius:4px;font-weight:600}
+.ba{background:#FEF9C3;color:#854D0E;font-size:10px;padding:2px 7px;border-radius:4px;font-weight:600}
+.no-data{padding:32px;text-align:center;color:#a8a29e;font-size:13px;border:1px dashed #e2e2e0;border-radius:10px}
+.st{font-size:10px;font-weight:600;color:#a8a29e;text-transform:uppercase;letter-spacing:.06em;margin:0 0 10px}
+.row{display:flex;justify-content:space-between;align-items:center;padding:6px 0;border-bottom:0.5px solid #f5f5f4;font-size:12px}
+.row:last-child{border:none}
+.row .rl{color:#78716c}
+.row .rv{font-weight:500}
+.sep{height:0.5px;background:#f5f5f4;margin:10px 0}
+.up-pills{display:flex;gap:5px;margin-bottom:14px;flex-wrap:wrap}
+.up{padding:6px 13px;font-size:11px;font-weight:500;border:0.5px solid #d6d3d1;border-radius:20px;background:#fff;color:#57534e;cursor:pointer;transition:all .15s}
+.up.active{background:#1F3864;color:#fff;border-color:#1F3864}
+.bar-wrap{height:6px;border-radius:3px;background:#f0ede9;overflow:hidden;margin:5px 0}
+.bar-fill{height:100%;border-radius:3px;transition:width .4s}
+.warn{background:#FFF7ED;border-left:3px solid #F97316;border-radius:0 8px 8px 0;padding:8px 12px;font-size:12px;color:#9A3412;margin:8px 0}
+.ok{background:#F0FDF4;border-left:3px solid #22C55E;border-radius:0 8px 8px 0;padding:8px 12px;font-size:12px;color:#166534;margin:8px 0}
+.sl-row{display:flex;align-items:center;gap:10px;padding:7px 0;border-bottom:0.5px solid #f5f5f4}
+.sl-row:last-of-type{border:none}
+.sl-row label{font-size:12px;color:#78716c;min-width:165px}
+.sl-row input[type=range]{flex:1;accent-color:#185FA5}
+.sl-val{font-size:12px;font-weight:600;color:#185FA5;min-width:60px;text-align:right}
+.reset-btn{margin-top:12px;width:100%;padding:8px;font-size:12px;border:0.5px solid #e2e2e0;border-radius:8px;background:#fff;cursor:pointer;color:#78716c;transition:background .15s}
+.reset-btn:hover{background:#f5f5f4}
+table.t{width:100%;border-collapse:collapse;font-size:12px}
+table.t th{font-size:10px;font-weight:600;color:#a8a29e;padding:5px 6px;border-bottom:0.5px solid #f0ede9;text-align:right;text-transform:uppercase;letter-spacing:.04em}
+table.t th:first-child{text-align:left}
+table.t td{padding:6px 6px;border-bottom:0.5px solid #fafaf9;text-align:right;font-size:12px}
+table.t td:first-child{text-align:left;color:#78716c}
+table.t tr.hl td{font-weight:500;background:#fafaf9}
+.footer{text-align:center;padding:28px 16px;font-size:11px;color:#a8a29e}
+</style>
+</head>
+<body>
+
+<div class="header">
+  <div class="header-left">
+    <h1>Финансовая модель группы предприятий</h1>
+    <p>Управленческий дашборд · 2026 год · Конфиденциально</p>
+  </div>
+</div>
+
+<div class="wrap">
+<div class="topbar">
+  <div class="nav-pills" id="nav">
+    <button class="np active" data-p="overview">Обзор</button>
+    <button class="np" data-p="units">Подразделения</button>
+    <button class="np" data-p="costs">Затраты</button>
+    <button class="np" data-p="scenario">Сценарии</button>
+    <button class="np" data-p="tbz">Точка безубыточности</button>
+  </div>
+  <div style="position:relative">
+    <button class="period-btn" id="pb">
+      <span class="period-dot"></span>
+      <span id="pl">Янв — Мар</span>
+      <svg class="chev" viewBox="0 0 16 16"><polyline points="4,6 8,10 12,6"/></svg>
+    </button>
+    <div class="dropdown" id="dd">
+      <div class="dd-sec">Месяцы</div>
+      <div class="dd-item" data-m="Январь"><span>Январь</span><div class="dd-check on" id="ck-Январь"></div></div>
+      <div class="dd-item" data-m="Февраль"><span>Февраль</span><div class="dd-check on" id="ck-Февраль"></div></div>
+      <div class="dd-item" data-m="Март"><span>Март</span><div class="dd-check on" id="ck-Март"></div></div>
+      <div class="dd-sep"></div>
+      <div class="dd-sec">Быстрый выбор</div>
+      <div class="dd-preset" data-preset="all">Все месяцы</div>
+      <div class="dd-preset" data-preset="last">Только март</div>
+      <div class="dd-preset" data-preset="first">Только январь</div>
+    </div>
+  </div>
+</div>
+
+<div id="overview"  class="page active"></div>
+<div id="units"     class="page"></div>
+<div id="costs"     class="page"></div>
+<div id="scenario"  class="page"></div>
+<div id="tbz"       class="page"></div>
+
+<div class="footer">Управленческая отчётность · Группа предприятий · 2026</div>
+</div>
+
+<script>
+const RAW={"Январь":{"Халтурина":{"vyr":4169916.11,"zakup":1255380.75,"sobstv":2914535.36,"suba":0,"zatr":4340149.55,"pr":3546104.14,"nds":208495.81,"usn":250194.97,"seb_z":810119.67,"seb_s":2177180.99,"upak":13340,"dost":0,"ekv":86772.71,"vp":623811.97,"op":794045.41,"arenda":95000,"kom":124739.08,"zapcz":10860,"info":18387,"ohz":10671.76,"zp":244900,"nzp":52584.76,"rko":7040.51,"poteri":64247.38,"kred":93622.42,"proch":0,"ship":47691.23,"buh":24301.27,"chp":-170233.44,"div":110796,"dolg":242400},"Целинная":{"vyr":2542329.22,"zakup":915954.35,"sobstv":1582074.87,"suba":44300,"zatr":3197349.15,"pr":2080117.39,"nds":124901.46,"usn":149881.75,"seb_z":604987.72,"seb_s":1182820.46,"upak":17526,"dost":0,"ekv":0,"vp":462211.83,"op":1117231.75,"arenda":318553.42,"kom":152825.79,"zapcz":0,"info":11909,"ohz":34383.6,"zp":522000,"nzp":0,"rko":0,"poteri":33667.3,"kred":0,"proch":0,"ship":29076.56,"buh":14816.08,"chp":-655019.93,"div":110000,"dolg":0},"Газонная":{"vyr":2255636.94,"zakup":687080.85,"sobstv":1375856.09,"suba":192700,"zatr":2406271.48,"pr":1782189.45,"nds":103146.85,"usn":123776.22,"seb_z":454750.6,"seb_s":1017471.77,"upak":19865,"dost":0,"ekv":63179.02,"vp":473447.49,"op":624082.03,"arenda":42000,"kom":78707.36,"zapcz":6000,"info":21909,"ohz":10392.04,"zp":264500,"nzp":44132.66,"rko":18524,"poteri":55741.3,"kred":43232.69,"proch":0,"ship":25797.67,"buh":13145.31,"chp":-150634.54,"div":386619.45,"dolg":230769},"Снайперов":{"vyr":4759521.81,"zakup":2364590.02,"sobstv":2394931.79,"suba":0,"zatr":4915006.26,"pr":3939644.81,"nds":237976.09,"usn":285571.31,"seb_z":1580502.98,"seb_s":1760247.52,"upak":25810,"dost":0,"ekv":49536.91,"vp":819877,"op":975361.45,"arenda":140000,"kom":158396.59,"zapcz":32000,"info":27318,"ohz":16315.84,"zp":452840,"nzp":42707.22,"rko":0,"poteri":2114.73,"kred":15651.13,"proch":5846.06,"ship":54434.54,"buh":27737.35,"chp":-155484.45,"div":0,"dolg":34329},"Цех":{"vyr":5812096.7,"zakup":45172.07,"sobstv":0,"suba":0,"zatr":5214614.33,"pr":4100733.72,"nds":0,"usn":0,"seb_z":0,"seb_s":4095128.72,"upak":0,"dost":5605,"ekv":0,"vp":1711362.98,"op":1113880.61,"arenda":129023.2,"kom":119053.42,"zapcz":0,"info":15000,"ohz":16315.12,"zp":812398.5,"nzp":0,"rko":750,"poteri":21340.37,"kred":0,"proch":0,"ship":0,"buh":0,"chp":597482.37,"div":0,"dolg":0},"ИТОГО":{"vyr":13772576.15,"zakup":5268178.04,"sobstv":8267398.11,"suba":237000,"zatr":13935670.03,"pr":9311068.78,"nds":674520.2,"usn":809424.24,"seb_z":3450360.97,"seb_s":4095128.72,"upak":76541,"dost":5605,"ekv":199488.64,"vp":4461507.37,"op":4624601.25,"arenda":724576.62,"kom":633722.24,"zapcz":48860,"info":94523,"ohz":88078.36,"zp":2296638.5,"nzp":139424.64,"rko":26314.51,"poteri":177111.08,"kred":152506.24,"proch":5846.06,"ship":157000,"buh":80000,"chp":-163093.88,"div":607415.45,"dolg":507498.81}},"Февраль":{"Халтурина":{"vyr":3824829.78,"zakup":1223856.94,"sobstv":2600972.84,"suba":0,"zatr":4040974.8,"pr":3259846.46,"nds":191241.49,"usn":229489.79,"seb_z":793163.74,"seb_s":1918607.53,"upak":17534,"dost":0,"ekv":109809.91,"vp":564983.32,"op":781128.35,"arenda":95000,"kom":113545.83,"zapcz":1181.71,"info":22886,"ohz":4705.4,"zp":258758,"nzp":114912.46,"rko":21817.5,"poteri":45047.61,"kred":28651.67,"proch":0,"ship":50024.83,"buh":24597.34,"chp":-216145.02,"div":172498,"dolg":151500},"Целинная":{"vyr":2236539.58,"zakup":864118.3,"sobstv":1342620,"suba":29801.28,"zatr":2625466.91,"pr":1815893.08,"nds":110336.92,"usn":132404.3,"seb_z":569985.06,"seb_s":992182.81,"upak":10984,"dost":0,"ekv":0,"vp":420646.5,"op":809573.82,"arenda":297589.86,"kom":128316.51,"zapcz":0,"info":11909,"ohz":41421,"zp":249000,"nzp":0,"rko":0,"poteri":37302.72,"kred":0,"proch":0,"ship":29251.63,"buh":14383.1,"chp":-388927.33,"div":110000,"dolg":0},"Газонная":{"vyr":2064486.56,"zakup":694920.32,"sobstv":1290866.24,"suba":78700,"zatr":2401785.89,"pr":1692981.52,"nds":99289.33,"usn":119147.19,"seb_z":453680.52,"seb_s":953882.87,"upak":10316,"dost":0,"ekv":56665.61,"vp":371505.04,"op":708804.37,"arenda":42000,"kom":80926.55,"zapcz":98567,"info":17909,"ohz":15942.95,"zp":237000,"nzp":63670.88,"rko":8486.25,"poteri":59035.65,"kred":44988.1,"proch":0,"ship":27001.36,"buh":13276.64,"chp":-337299.33,"div":386619.45,"dolg":230769},"Снайперов":{"vyr":4313962.09,"zakup":2009926.53,"sobstv":2304035.56,"suba":0,"zatr":4271875.19,"pr":3501652.84,"nds":215698.1,"usn":258837.73,"seb_z":1303383.77,"seb_s":1693798.24,"upak":29935,"dost":0,"ekv":0,"vp":812309.25,"op":770222.35,"arenda":140000,"kom":37783.5,"zapcz":0,"info":22853,"ohz":7133.69,"zp":449936,"nzp":0,"rko":1598,"poteri":1678.19,"kred":8591.48,"proch":16483.38,"ship":56422.18,"buh":27742.93,"chp":42086.9,"div":0,"dolg":34329},"Цех":{"vyr":5436713.76,"zakup":93880.54,"sobstv":0,"suba":0,"zatr":4601991.52,"pr":3439210.88,"nds":0,"usn":0,"seb_z":0,"seb_s":3439210.88,"upak":0,"dost":0,"ekv":0,"vp":1997502.88,"op":1162780.64,"arenda":129023.2,"kom":98089.86,"zapcz":0,"info":0,"ohz":28433.58,"zp":883921.6,"nzp":0,"rko":0,"poteri":23312.4,"kred":0,"proch":0,"ship":0,"buh":0,"chp":834722.24,"div":0,"dolg":0},"ИТОГО":{"vyr":12533698.55,"zakup":4886702.63,"sobstv":7538494.64,"suba":108501.28,"zatr":12383622.86,"pr":8151113.33,"nds":616565.84,"usn":739879,"seb_z":3120213.09,"seb_s":3439210.88,"upak":68769,"dost":0,"ekv":166475.52,"vp":4382585.22,"op":4232509.53,"arenda":703613.06,"kom":458662.25,"zapcz":99748.71,"info":75557,"ohz":97636.62,"zp":2078615.6,"nzp":178583.34,"rko":31901.75,"poteri":166376.57,"kred":82231.25,"proch":16483.38,"ship":162700,"buh":80000,"chp":-519041.76,"div":669117.45,"dolg":416598.81}},"Март":{"Халтурина":{"vyr":3941831.66,"zakup":1382983.44,"sobstv":2558848.22,"suba":0,"zatr":4364415.88,"pr":3394337.96,"nds":197091.58,"usn":236509.9,"seb_z":923276.35,"seb_s":1907161.92,"upak":8971,"dost":0,"ekv":121327.21,"vp":547493.7,"op":970077.92,"arenda":95000,"kom":122449.37,"zapcz":20950,"info":18800,"ohz":20228.14,"zp":277800,"nzp":121569.3,"rko":12990,"poteri":51340.35,"kred":133920.85,"proch":0,"ship":71851.88,"buh":23178.03,"chp":-422584.22,"div":219107,"dolg":333300},"Целинная":{"vyr":2516065.11,"zakup":994069.37,"sobstv":1491995.74,"suba":30000,"zatr":2807342.1,"pr":2050540.01,"nds":124303.26,"usn":149163.91,"seb_z":656451.32,"seb_s":1108890.53,"upak":11731,"dost":0,"ekv":0,"vp":465525.1,"op":756802.09,"arenda":290157.28,"kom":116665.82,"zapcz":0,"info":15909,"ohz":7102,"zp":227500,"nzp":0,"rko":0,"poteri":38810.54,"kred":0,"proch":0,"ship":45862.95,"buh":14794.5,"chp":-291276.99,"div":153290.17,"dolg":0},"Газонная":{"vyr":2369586.34,"zakup":822489.48,"sobstv":1447496.86,"suba":99600,"zatr":2521545.44,"pr":1925185.02,"nds":113499.32,"usn":136199.18,"seb_z":547644.97,"seb_s":1071175.94,"upak":0,"dost":0,"ekv":56665.61,"vp":444401.32,"op":596360.42,"arenda":42000,"kom":74197.63,"zapcz":5000,"info":27309,"ohz":6977.8,"zp":225000,"nzp":63723.09,"rko":4225,"poteri":48468.63,"kred":42333.14,"proch":0,"ship":43192.93,"buh":13933.2,"chp":-151959.1,"div":356220.87,"dolg":230769},"Снайперов":{"vyr":4777925.63,"zakup":2131170.2,"sobstv":2646755.43,"suba":0,"zatr":4661146.6,"pr":3908137.43,"nds":238896.28,"usn":286675.54,"seb_z":1398289.93,"seb_s":1941381.18,"upak":42894.5,"dost":0,"ekv":0,"vp":869788.2,"op":753009.17,"arenda":140000,"kom":6700,"zapcz":0,"info":27318,"ohz":6580,"zp":434752,"nzp":0,"rko":428.57,"poteri":1003.01,"kred":15927.64,"proch":5113.44,"ship":87092.24,"buh":28094.27,"chp":116779.03,"div":0,"dolg":35004},"Цех":{"vyr":6164740.92,"zakup":107281.7,"sobstv":0,"suba":0,"zatr":5026307.18,"pr":3956126.31,"nds":0,"usn":0,"seb_z":0,"seb_s":3906839.36,"upak":43186.95,"dost":6100,"ekv":0,"vp":2208614.61,"op":1070180.87,"arenda":129023.2,"kom":90657.28,"zapcz":2200,"info":0,"ohz":25683,"zp":782154.28,"nzp":0,"rko":10000,"poteri":30463.11,"kred":0,"proch":0,"ship":0,"buh":0,"chp":1138433.74,"div":0,"dolg":0},"ИТОГО":{"vyr":13712690.44,"zakup":5437994.19,"sobstv":8145096.25,"suba":129600,"zatr":13352147.63,"pr":9205717.16,"nds":673790.44,"usn":808548.52,"seb_z":3525662.57,"seb_s":3906839.36,"upak":106783.45,"dost":6100,"ekv":177992.82,"vp":4506973.28,"op":4146430.47,"arenda":696180.48,"kom":410670.1,"zapcz":28150,"info":89336,"ohz":66570.94,"zp":1947206.28,"nzp":185292.39,"rko":27643.57,"poteri":170085.64,"kred":192181.63,"proch":5113.44,"ship":248000,"buh":80000,"chp":-368075.23,"div":728618.04,"dolg":599073.99}}};
+
+const ALL=['Январь','Февраль','Март'],UNITS=['Халтурина','Целинная','Газонная','Снайперов','Цех'],SM={'Январь':'Янв','Февраль':'Фев','Март':'Мар'};
+let sel=new Set(['Январь','Февраль','Март']);
+const f=v=>{const a=Math.abs(v);const s=a>=1e6?(a/1e6).toFixed(2)+' млн':a>=1e3?(a/1e3).toFixed(0)+' тыс':Math.round(a).toLocaleString('ru');return(v<0?'−':'')+s+' ₽';};
+const p=v=>(v*100).toFixed(1)+'%';const sg=v=>v>=0?'green':'red';const tg=v=>v>=0?'bg':'br';
+const gm=()=>ALL.filter(m=>sel.has(m));const ag=(u,k)=>gm().reduce((s,m)=>s+(RAW[m][u][k]||0),0);const nd=()=>gm().length===0;
+const CH={};const dc=id=>{if(CH[id]){CH[id].destroy();delete CH[id];}};
+function upLabel(){const ms=gm(),el=document.getElementById('pl');if(!el)return;if(ms.length===0)el.textContent='Не выбрано';else if(ms.length===1)el.textContent=ms[0];else if(ms.length===ALL.length)el.textContent='Янв — Мар';else el.textContent=ms.map(m=>SM[m]).join(', ');}
+function upChecks(){ALL.forEach(m=>{const c=document.getElementById('ck-'+m);if(c)c.classList.toggle('on',sel.has(m));});upLabel();}
+const pb=document.getElementById('pb'),dd=document.getElementById('dd');
+pb.addEventListener('click',e=>{e.stopPropagation();dd.classList.toggle('open');});
+document.addEventListener('click',()=>dd.classList.remove('open'));
+dd.addEventListener('click',e=>e.stopPropagation());
+document.querySelectorAll('.dd-item').forEach(el=>{el.addEventListener('click',()=>{const m=el.dataset.m;if(sel.has(m)){if(sel.size>1)sel.delete(m);}else sel.add(m);upChecks();rerender();});});
+document.querySelectorAll('.dd-preset').forEach(el=>{el.addEventListener('click',()=>{const p=el.dataset.preset;if(p==='all')sel=new Set(ALL);else if(p==='last'){sel=new Set();sel.add(ALL[ALL.length-1]);}else{sel=new Set();sel.add(ALL[0]);}upChecks();rerender();dd.classList.remove('open');});});
+upChecks();
+let AP='overview';
+function rerender(){if(AP==='overview')renderOverview();else if(AP==='units')renderUnitBody();else if(AP==='costs')renderCostsBody();else if(AP==='scenario')updateScenario();else if(AP==='tbz')renderTBZ();}
+document.querySelectorAll('.np').forEach(b=>{b.addEventListener('click',()=>{document.querySelectorAll('.np').forEach(x=>x.classList.remove('active'));document.querySelectorAll('.page').forEach(x=>x.classList.remove('active'));b.classList.add('active');AP=b.dataset.p;document.getElementById(AP).classList.add('active');rerender();});});
+
+function renderOverview(){
+  const pg=document.getElementById('overview');if(nd()){pg.innerHTML=`<div class="no-data">Выберите месяц</div>`;return;}
+  const ms=gm(),n=ms.length,d=k=>ag('ИТОГО',k),vyr=d('vyr'),vp=d('vp'),chp=d('chp'),div=d('div'),dolg=d('dolg'),zatr=d('zatr'),pr=d('pr'),op=d('op'),arenda=d('arenda'),zp=d('zp'),kred=d('kred'),varOPR=d('kom')+d('zapcz')+d('ohz')+d('poteri')+d('proch'),fixed=op-varOPR,kmd=vyr?vp/vyr:0;
+  pg.innerHTML=`<div class="g3"><div class="kpi neu"><div class="kl">Выручка${n>1?' ('+n+' мес.)':''}</div><div class="kv">${f(vyr)}</div><div class="ks">${n>1?f(Math.round(vyr/n))+' в среднем/мес.':ms[0]}</div></div><div class="kpi ${sg(vp)}"><div class="kl">Валовая прибыль</div><div class="kv ${sg(vp)}">${f(vp)}</div><div class="ks">КМД: ${p(kmd)}</div></div><div class="kpi ${sg(chp)}"><div class="kl">Чистая прибыль</div><div class="kv ${sg(chp)}">${f(chp)}</div><div class="ks">${p(vyr?chp/vyr:0)} рентабельность</div></div></div>
+  <div class="g2"><div class="card"><div class="st">Выручка и ЧП по месяцам</div><div style="position:relative;height:175px"><canvas id="ch_v" role="img" aria-label="Выручка и ЧП"></canvas></div></div><div class="card"><div class="st">ЧП по подразделениям</div><div style="position:relative;height:175px"><canvas id="ch_c" role="img" aria-label="ЧП по подразделениям"></canvas></div></div></div>
+  <div class="g2"><div class="card"><div class="st">Кассовая нагрузка</div>${[['Чистая прибыль',chp],['Дивиденды выплачены',-div],['Погашение долга',-dolg]].map(([l,v])=>`<div class="row"><span class="rl">${l}</span><span class="rv ${sg(v)}">${f(v)}</span></div>`).join('')}</div><div class="card"><div class="st">Ключевые коэффициенты</div>${[['Аренда / выручка',p(vyr?arenda/vyr:0),arenda/vyr>0.07],['ФОТ / выручка',p(vyr?zp/vyr:0),false],['Кредиты / выручка',p(vyr?kred/vyr:0),kred/vyr>0.03],['Пост. ОПР / выручка',p(vyr?fixed/vyr:0),false]].map(([l,v,w])=>`<div class="row"><span class="rl">${l}</span><span class="rv">${w?`<span class="ba">${v} !</span>`:v}</span></div>`).join('')}</div></div>`;
+  dc('ch_v');dc('ch_c');
+  CH['ch_v']=new Chart(document.getElementById('ch_v'),{type:'bar',data:{labels:ALL,datasets:[{data:ALL.map(m=>sel.has(m)?Math.round(RAW[m]['ИТОГО'].vyr):null),backgroundColor:ALL.map(m=>sel.has(m)?'#378ADD':'#E7E5E4'),borderRadius:5,barPercentage:.45},{data:ALL.map(m=>sel.has(m)?Math.round(RAW[m]['ИТОГО'].chp):null),backgroundColor:ALL.map(m=>sel.has(m)?(RAW[m]['ИТОГО'].chp>=0?'#1D9E75':'#E24B4A'):'#E7E5E4'),borderRadius:5,barPercentage:.45}]},options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{display:false}},scales:{x:{grid:{display:false}},y:{grid:{color:'rgba(0,0,0,.04)'},ticks:{callback:v=>(v/1e6).toFixed(1)+'М'}}}}});
+  const cd=UNITS.map(u=>Math.round(ag(u,'chp')));
+  CH['ch_c']=new Chart(document.getElementById('ch_c'),{type:'bar',data:{labels:UNITS,datasets:[{data:cd,backgroundColor:cd.map(v=>v>=0?'#1D9E75':'#E24B4A'),borderRadius:5,barPercentage:.6}]},options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{display:false}},scales:{x:{grid:{display:false}},y:{grid:{color:'rgba(0,0,0,.04)'},ticks:{callback:v=>(v/1e3).toFixed(0)+'к'}}}}});
+}
+
+let su='Халтурина';
+function renderUnits(){const pg=document.getElementById('units');pg.innerHTML=`<div class="up-pills" id="ups">${UNITS.map(u=>`<button class="up${u===su?' active':''}" data-u="${u}">${u}</button>`).join('')}</div><div id="ub"></div>`;pg.querySelectorAll('.up').forEach(b=>b.addEventListener('click',()=>{su=b.dataset.u;renderUnitBody();}));renderUnitBody();}
+function renderUnitBody(){
+  if(!document.getElementById('ups'))return;
+  document.querySelectorAll('.up').forEach(b=>b.classList.toggle('active',b.dataset.u===su));
+  const ub=document.getElementById('ub');if(!ub)return;
+  if(nd()){ub.innerHTML=`<div class="no-data">Выберите месяц</div>`;return;}
+  const ms=gm(),n=ms.length,u=su,d=k=>ag(u,k),vyr=d('vyr'),vp=d('vp'),chp=d('chp'),op=d('op'),arenda=d('arenda'),zp=d('zp'),kred=d('kred'),nzp=d('nzp'),info=d('info'),ship=d('ship'),buh=d('buh'),rko=d('rko'),kmd=vyr?vp/vyr:0,fixed=arenda+zp+nzp+info+ship+buh+rko+kred,tbz=kmd>0?fixed/kmd:0,safety=vyr-tbz;
+  ub.innerHTML=`<div class="g3" style="margin-bottom:12px"><div class="kpi neu"><div class="kl">Выручка${n>1?' ('+n+' мес.)':''}</div><div class="kv">${f(vyr)}</div>${n>1?`<div class="ks">${f(Math.round(vyr/n))}/мес.</div>`:''}</div><div class="kpi ${sg(vp)}"><div class="kl">Валовая прибыль</div><div class="kv ${sg(vp)}">${f(vp)}</div><div class="ks">${p(vyr?vp/vyr:0)} от выручки</div></div><div class="kpi ${sg(chp)}"><div class="kl">Чистая прибыль</div><div class="kv ${sg(chp)}">${f(chp)}</div><div class="ks">${p(vyr?chp/vyr:0)} рентабельность</div></div></div>
+  <div class="g2"><div class="card"><div class="st">Динамика</div><div style="position:relative;height:155px"><canvas id="ch_ud" role="img" aria-label="Динамика ${u}"></canvas></div></div><div class="card"><div class="st">Точка безубыточности</div>${[['КМД',p(kmd)],['Пост. расходы',f(fixed)],['ТБЗ',f(tbz)],['Запас / дефицит',f(safety)]].map(([l,v],i)=>`<div class="row"><span class="rl">${l}</span><span class="rv${i===3?' '+sg(safety):''}">${v}</span></div>`).join('')}<div class="bar-wrap" style="margin-top:10px"><div class="bar-fill" style="width:${Math.min(100,tbz?vyr/tbz*100:100).toFixed(1)}%;background:${safety>=0?'#1D9E75':'#E24B4A'}"></div></div>${safety>=0?`<div class="ok" style="margin-top:8px">Выше ТБЗ — запас ${p(vyr?safety/vyr:0)}</div>`:`<div class="warn" style="margin-top:8px">Дефицит ${f(Math.abs(safety))}</div>`}</div></div>
+  <div class="card"><div class="st">P&L за период</div><table class="t"><tr><th>Показатель</th>${ms.map(m=>`<th>${SM[m]}</th>`).join('')}${n>1?'<th>Итого</th>':''}</tr>${[['Выручка','vyr'],['Произв. затраты','pr'],['Валовая прибыль','vp'],['ОПР','op'],['Чистая прибыль','chp']].map(([l,k],i)=>`<tr${i%2===0?' class="hl"':''}><td>${l}</td>${ms.map(m=>`<td class="${k==='chp'||k==='vp'?sg(RAW[m][u][k]):''}">${f(RAW[m][u][k])}</td>`).join('')}${n>1?`<td class="${k==='chp'||k==='vp'?sg(d(k)):''}"><b>${f(d(k))}</b></td>`:''}</tr>`).join('')}</table></div>`;
+  dc('ch_ud');
+  CH['ch_ud']=new Chart(document.getElementById('ch_ud'),{type:'line',data:{labels:ALL,datasets:[{data:ALL.map(m=>sel.has(m)?Math.round(RAW[m][u].vyr):null),borderColor:'#378ADD',tension:.35,fill:false,spanGaps:false,pointBackgroundColor:'#378ADD',pointRadius:4},{data:ALL.map(m=>sel.has(m)?Math.round(RAW[m][u].chp):null),borderColor:'#E24B4A',tension:.35,fill:false,spanGaps:false,pointBackgroundColor:'#E24B4A',pointRadius:4}]},options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{display:false}},scales:{x:{grid:{display:false}},y:{grid:{color:'rgba(0,0,0,.04)'},ticks:{callback:v=>(v/1e3).toFixed(0)+'к'}}}}});
+}
+
+function renderCosts(){document.getElementById('costs').innerHTML=`<div id="cb"></div>`;renderCostsBody();}
+function renderCostsBody(){
+  const cb=document.getElementById('cb');if(!cb)return;if(nd()){cb.innerHTML=`<div class="no-data">Выберите месяц</div>`;return;}
+  const d=k=>ag('ИТОГО',k),vyr=d('vyr'),pr=d('pr'),op=d('op'),varOPR=d('kom')+d('zapcz')+d('ohz')+d('poteri')+d('proch'),fixed=op-varOPR;
+  cb.innerHTML=`<div class="g3"><div class="kpi neu"><div class="kl">Производственные</div><div class="kv">${f(pr)}</div><div class="ks">${p(vyr?pr/vyr:0)} от выручки</div></div><div class="kpi neg"><div class="kl">Постоянные ОПР</div><div class="kv">${f(fixed)}</div><div class="ks">${p(vyr?fixed/vyr:0)} от выручки</div></div><div class="kpi neg"><div class="kl">Переменные ОПР</div><div class="kv">${f(varOPR)}</div><div class="ks">${p(vyr?varOPR/vyr:0)} от выручки</div></div></div>
+  <div class="g2"><div class="card"><div class="st">Производственные (переменные)</div>${[['НДС 5%','nds'],['УСН 6%','usn'],['Себест. закупной','seb_z'],['Себест. собств.','seb_s'],['Упаковка','upak'],['Доставка','dost'],['Эквайринг','ekv']].map(([l,k])=>{const v=d(k);return v>0?`<div class="row"><span class="rl">${l}</span><span class="rv">${f(v)} <span style="font-size:10px;color:#a8a29e">${p(vyr?v/vyr:0)}</span></span></div>`:''}).join('')}</div>
+  <div class="card"><div class="st">Постоянные</div>${[['Аренда','arenda'],['ФОТ','zp'],['Налоги на ЗП','nzp'],['% по кредитам','kred'],['Инф. услуги','info'],['Шипицын СГ','ship'],['Бухгалтерия','buh'],['РКО','rko']].map(([l,k])=>{const v=d(k),isAr=k==='arenda'&&v/vyr>0.07;return v>0?`<div class="row"><span class="rl">${l}</span><span class="rv">${isAr?`<span class="ba">${f(v)}</span>`:f(v)} <span style="font-size:10px;color:#a8a29e">${p(vyr?v/vyr:0)}</span></span></div>`:''}).join('')}<div class="sep"></div><div class="st" style="margin-top:0">Переменные ОПР</div>${[['Коммунальные','kom'],['Запчасти','zapcz'],['Общехоз.','ohz'],['Потери','poteri'],['Прочие','proch']].map(([l,k])=>{const v=d(k);return v>0?`<div class="row"><span class="rl">${l}</span><span class="rv">${f(v)} <span style="font-size:10px;color:#a8a29e">${p(vyr?v/vyr:0)}</span></span></div>`:''}).join('')}</div></div>
+  <div class="card"><div class="st">Аренда по точкам — доля в выручке (норма ≤7%)</div>${UNITS.map(u=>{const a=ag(u,'arenda'),v=ag(u,'vyr'),r=v?a/v:0;return a>0?`<div class="row"><span class="rl">${u}</span><div style="flex:1;margin:0 12px"><div class="bar-wrap"><div class="bar-fill" style="width:${Math.min(100,r/0.15*100).toFixed(1)}%;background:${r>0.07?'#E24B4A':'#1D9E75'}"></div></div></div><span class="${r>0.07?'br':'bg'}">${p(r)}</span></div>`:''}).join('')}</div>`;
+}
+
+let sc={vyr_delta:0,nac_delta:0,arenda_delta:0,zp_delta:0,kred_delta:0};
+function renderScenario(){
+  const pg=document.getElementById('scenario');
+  pg.innerHTML=`<div class="g2"><div class="card"><div class="st">Параметры сценария</div>${[['vyr_delta','Изменение выручки','%',-30,50],['nac_delta','Изменение наценки','пп',-10,20],['arenda_delta','Изменение аренды','%',-30,30],['zp_delta','Изменение ФОТ','%',-20,30],['kred_delta','% по кредитам','%',-100,50]].map(([k,l,u,mn,mx])=>`<div class="sl-row"><label>${l}</label><input type="range" min="${mn}" max="${mx}" step="1" value="${sc[k]}" id="sl_${k}"><span class="sl-val" id="ov_${k}">${sc[k]>=0?'+':''}${sc[k]} ${u}</span></div>`).join('')}<button class="reset-btn" onclick="resetSc()">Сбросить</button></div><div class="card" id="scr"></div></div><div class="card"><div class="st">Факт vs сценарий — ЧП по подразделениям</div><div style="position:relative;height:190px"><canvas id="ch_sc" role="img" aria-label="Сравнение"></canvas></div></div>`;
+  ['vyr_delta','nac_delta','arenda_delta','zp_delta','kred_delta'].forEach(k=>{const sl=document.getElementById('sl_'+k);if(sl)sl.addEventListener('input',()=>{sc[k]=+sl.value;updateScenario();});});
+  updateScenario();
+}
+function resetSc(){sc={vyr_delta:0,nac_delta:0,arenda_delta:0,zp_delta:0,kred_delta:0};['vyr_delta','nac_delta','arenda_delta','zp_delta','kred_delta'].forEach(k=>{const s=document.getElementById('sl_'+k);if(s)s.value=0;});updateScenario();}
+function calcSc(u){const t={vyr:0,vp:0,arenda:0,zp:0,kred:0,op:0};gm().forEach(m=>Object.keys(t).forEach(k=>t[k]+=(RAW[m][u][k]||0)));const vs=t.vyr*(1+sc.vyr_delta/100),vps=t.vp+t.vyr*(sc.nac_delta/100)+(vs-t.vyr)*(t.vyr?t.vp/t.vyr:0),ops=t.op-t.arenda-t.zp-t.kred+t.arenda*(1+sc.arenda_delta/100)+t.zp*(1+sc.zp_delta/100)+t.kred*(1+sc.kred_delta/100);return{vs,vps,cs:vps-ops};}
+function updateScenario(){
+  if(nd()){const r=document.getElementById('scr');if(r)r.innerHTML=`<div class="no-data">Выберите месяц</div>`;return;}
+  ['vyr_delta','nac_delta','arenda_delta','zp_delta','kred_delta'].forEach(k=>{const o=document.getElementById('ov_'+k),u=k==='nac_delta'?'пп':'%';if(o)o.textContent=(sc[k]>=0?'+':'')+sc[k]+' '+u;});
+  const s=calcSc('ИТОГО'),fact=gm().reduce((a,m)=>a+(RAW[m]['ИТОГО'].chp||0),0);
+  const r=document.getElementById('scr');
+  if(r)r.innerHTML=`<div class="st">Результат (группа)</div>${[['Выручка (сценарий)',s.vs,false],['Валовая прибыль',s.vps,true],['ЧП факт',fact,true],['ЧП сценарий',s.cs,true]].map(([l,v,c])=>`<div class="row"><span class="rl">${l}</span><span class="rv${c?' '+sg(v):''}">${f(v)}</span></div>`).join('')}<div class="sep"></div><div class="row"><span class="rl">Изменение ЧП</span><span class="rv ${sg(s.cs-fact)}">${s.cs-fact>=0?'+':''}${f(s.cs-fact)}</span></div>${s.cs>=0?`<div class="ok" style="margin-top:8px">Сценарий выводит группу в прибыль</div>`:`<div class="warn" style="margin-top:8px">Убыток: ${f(s.cs)}</div>`}`;
+  dc('ch_sc');
+  const fd=UNITS.map(u=>Math.round(gm().reduce((a,m)=>a+(RAW[m][u].chp||0),0))),sd=UNITS.map(u=>Math.round(calcSc(u).cs));
+  CH['ch_sc']=new Chart(document.getElementById('ch_sc'),{type:'bar',data:{labels:UNITS,datasets:[{label:'Факт',data:fd,backgroundColor:'#D6D3D1',borderRadius:4,barPercentage:.6},{label:'Сценарий',data:sd,backgroundColor:sd.map(v=>v>=0?'#1D9E75':'#E24B4A'),borderRadius:4,barPercentage:.6}]},options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{display:false}},scales:{x:{grid:{display:false}},y:{grid:{color:'rgba(0,0,0,.04)'},ticks:{callback:v=>(v/1e3).toFixed(0)+'к'}}}}});
+}
+
+function renderTBZ(){
+  const pg=document.getElementById('tbz');if(nd()){pg.innerHTML=`<div class="no-data">Выберите месяц</div>`;return;}
+  const ms=gm(),n=ms.length,shops=UNITS.filter(u=>u!=='Цех'),td=shops.map(u=>{const d=k=>ag(u,k),vyr=d('vyr'),vp=d('vp'),kmd=vyr?vp/vyr:0,fx=d('arenda')+d('zp')+d('nzp')+d('info')+d('ship')+d('buh')+d('rko')+d('kred'),tbz=kmd>0?fx/kmd:0,safety=vyr-tbz;return{u,vyr,kmd,fx,tbz,safety};});
+  pg.innerHTML=`<div class="g2">${td.map(({u,vyr,kmd,fx,tbz,safety})=>`<div class="card"><div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:12px"><span style="font-size:14px;font-weight:600">${u}</span><span class="${tg(safety)}">${safety>=0?'Выше ТБЗ':'Ниже ТБЗ'}</span></div>${[['Выручка',f(vyr),''],['КМД',p(kmd),''],['Пост. расходы',f(fx),''],['ТБЗ',f(tbz),''],['Запас / дефицит',f(safety),sg(safety)]].map(([l,v,c])=>`<div class="row"><span class="rl">${l}</span><span class="rv${c?' '+c:''}">${v}</span></div>`).join('')}<div class="bar-wrap" style="margin-top:10px"><div class="bar-fill" style="width:${Math.min(100,tbz?vyr/tbz*100:100).toFixed(1)}%;background:${safety>=0?'#1D9E75':'#E24B4A'}"></div></div>${safety<0?`<div class="warn" style="margin-top:8px">Нужен оборот +${f(Math.abs(safety))}</div>`:`<div class="ok" style="margin-top:8px">Запас ${p(vyr?safety/vyr:0)}</div>`}</div>`).join('')}</div>
+  <div class="card"><div class="st">Выручка vs ТБЗ по точкам</div><div style="position:relative;height:190px"><canvas id="ch_tbz" role="img" aria-label="ТБЗ по точкам"></canvas></div></div>`;
+  dc('ch_tbz');
+  CH['ch_tbz']=new Chart(document.getElementById('ch_tbz'),{type:'bar',data:{labels:shops,datasets:[{label:'Выручка',data:td.map(d=>Math.round(d.vyr)),backgroundColor:'#378ADD',borderRadius:5,barPercentage:.55},{label:'ТБЗ',data:td.map(d=>Math.round(d.tbz)),backgroundColor:'#E24B4A',borderRadius:5,barPercentage:.55}]},options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{display:false}},scales:{x:{grid:{display:false}},y:{grid:{color:'rgba(0,0,0,.04)'},ticks:{callback:v=>(v/1e3).toFixed(0)+'к'}}}}});
+}
+
+renderOverview();
+</script>
+</body>
+</html>
